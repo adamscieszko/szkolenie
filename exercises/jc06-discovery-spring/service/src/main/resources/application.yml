@@ -1,0 +1,4 @@
+# set application name to be used in discovery
+spring:
+  application:
+    name: "service"

@@ -1,0 +1,134 @@
+# Getting started with service discovery and configuration
+:port: 9000
+
+## Infrastructure (discovery and configuration)
+
+.Discovery service
+In a first step you have to start eureka instance, so your new shiny microservice can register
+
+`cd registry` +
+`mvn springboot:run`
+
+This will run eureka embedded as spring-boot application. There are quite a few alternatives (consul, zookeeper) - but we will be using eureka. Not because it's better - it's simpler to run and demonstrate. Eureka should start on the default port `8761`
+
+.Externalized configuration
+In the next step run the configuration service
+
+`cd configuration` +
+`mvn springboot:run`
+
+The spring-cloud-config listens at the detault port `8888`. You can go and the current configuration at `curl http://localhost:8888/service/default`.
+
+The pattern words as follows: http://localhost:8888/{application_name}/{profile}. You should see more or less something like this
+
+[source, json]
+----
+{
+
+    "name": "service",
+    "profiles": [
+        "other"
+    ],
+    "label": null,
+    "version": null,
+    "propertySources": [
+        {
+            "name": "classpath:/config/service.properties",
+            "source": {
+                "message": "Hello world!"
+            }
+        }
+    ]
+
+}
+----
+
+As we run the configuration in a simplest, native and embedded mode, the easiest way to alter the configuration is to modify `client.properties` file located in `/target/classes/config`. Changes take effect immediately.
+
+## Starting application
+
+Now the funny part, build and start your microservices:
+
+`cd client` +
+`mvn springboot:run -Dserver.port={port}`
+
+
+## Testing registration in discovery
+
+Check if instance has registered in eureka, simply by running `curl -H "Accept: application/json" http://localhost:8761/eureka/apps` you should see something like follow:
+
+[source, json]
+----
+{"applications":
+  {"versions__delta": "1",
+    "apps__hashcode": "UP_1_",
+    "application": [
+      {
+        "name": "SERVICE",
+        "instance": [
+          {
+            "instanceId": "10.58.75.80:configuration:9000",
+            "hostName": "10.58.75.80",
+            "app": "SERVICE"
+          }
+        ]
+      }
+    ]
+  }
+}
+----
+
+// to properly register within eureka
+////
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+    statusPageUrlPath: /admin/info
+    healthCheckUrlPath: /admin/health
+////
+
+## Running application
+
+The application runs at port {port} so running `curl http://localhost:{port}/greeting` results in a desired greeting
+
+[source, json]
+----
+{
+  "message": "Hello world!"
+}
+----
+
+## Altering configuration
+
+When configuration is altered and message is changes, the service needs to be refreshed:
+
+`curl -X POST http://localhost:{port}/refresh`
+
+When multiple instances are registered under the same appId, the refresh can be orchestrated via events through centralized bus (`spring-cloud-bus`)
+
+## Client side load balancing
+
+Client application call the service provider and simply displays the greeting. Load balancing can be configured per service in `application.properties` through: `service.ribbon.eureka.enabled=true`
+
+[source, java]
+----
+@Configuration
+@EnableDiscoveryClient
+@RibbonClient("service") // <1>
+public class ClientApplication {
+
+    @LoadBalanced // <2>
+    @Bean
+    RestTemplate restTemplate(){
+        return new RestTemplate();
+    }
+
+}
+----
+<1> Sets up client side load balancing for service named: `service`
+<2> Denoted `RestTemplate` instance aware of available instances (from eureka)

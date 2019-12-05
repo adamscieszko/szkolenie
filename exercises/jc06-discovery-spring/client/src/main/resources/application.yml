@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: client
+
+service:
+  ribbon:
+    eureka:
+      enabled: true
