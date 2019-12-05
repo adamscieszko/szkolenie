@@ -1,6 +1,6 @@
 # Microservices workshops
 
-## https://github.com/kubamarchwicki/20191205-szkolenie
+## https://github.com/kubamarchwicki/szkolenie
 
 ## Książeczki i artykuły
 
