@@ -33,7 +33,6 @@ public class Application {
     private static final Integer port = valueOf(ofNullable(getProperty(PORT_PROPERTY))
             .orElse("8081"));
 
-<<<<<<< HEAD
     public static void main(String[] args) throws Exception {
 
         // Load zip specific filesystem provider when run from inside a fat-jar
@@ -42,13 +41,10 @@ public class Application {
             FileSystems.newFileSystem(uri, emptyMap());
         }
 
-=======
-    public static void main(String[] args) {
         //setup Eureka
         ApplicationInfoManager applicationInfoManager = setupEurekaClient();
 
         //setup SparkJava application
->>>>>>> 98488c4... Service discovery: registering banners-service through eureka-client
         port(port);
         staticFileLocation("/webapp");
         exception(Exception.class, (exception, request, response) -> exception.printStackTrace());
