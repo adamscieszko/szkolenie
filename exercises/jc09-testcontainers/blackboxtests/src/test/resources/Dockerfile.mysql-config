@@ -1,0 +1,5 @@
+FROM busybox
+
+ADD db/00-database-config.sql /docker-entrypoint-initdb.d/00-database-config.sql
+
+VOLUME /docker-entrypoint-initdb.d/

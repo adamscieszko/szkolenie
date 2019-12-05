@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/world?useSSL=false
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASS}
+
+service:
+  weather: ${WEATHER_SERVICE_URL}
