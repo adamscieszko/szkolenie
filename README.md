@@ -2,8 +2,6 @@
 
 ## https://github.com/kubamarchwicki/szkolenie
 
-## Ankieta
-https://forms.gle/M6XxmnBVoGGHGXDv7
 
 ## Książeczki i artykuły
 
